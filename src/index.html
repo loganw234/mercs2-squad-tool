@@ -35,6 +35,19 @@
   <div class="grid">
 
     <section class="card" style="grid-column:1/-1">
+      <h2>Quick Spawn</h2>
+      <div class="row">
+        <select id="quickSpawnFaction"></select>
+        <input type="number" id="quickSpawnCount" value="1" min="1" max="8" class="num" title="how many">
+        <button class="primary" id="btnQuickSpawn">Spawn + Recruit</button>
+        <span class="hint" style="margin:0">Spawns near you, neutralizes relations both ways, and recruits
+          it straight onto the roster -- the fastest way to have something to experiment with without
+          already having a guid. "unverified" factions are corpus-sourced template names, not yet
+          independently live-tested by this tool -- try one and see.</span>
+      </div>
+    </section>
+
+    <section class="card" style="grid-column:1/-1">
       <h2>Roster (debugger)</h2>
       <div class="row">
         <button class="primary" id="btnRosterMonitor">Start monitoring</button>
