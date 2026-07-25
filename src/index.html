@@ -1,0 +1,196 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>Followers/Squad Tool -- mercs2 Ess.Followers/Ess.Squad control panel</title>
+<style>/*__LEAFLET_CSS__*/</style>
+<style>/*__CSS__*/</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header>
+    <h1>Followers/Squad Tool</h1>
+    <span class="sub">create, manage, and order Ess.Followers/Ess.Squad from a webpage -- no Lua required</span>
+    <div class="connectbar">
+      <span class="dot" id="dot"></span>
+      <span class="statustext" id="statusText">not connected</span>
+      <button class="primary" id="btnConnect">Connect</button>
+    </div>
+  </header>
+
+  <section class="card" style="margin-bottom:16px">
+    <h2>Live Map</h2>
+    <div id="squadMap"></div>
+    <div class="row" style="margin-top:6px">
+      <span id="mapCoordBar" class="mono hint" style="margin:0"></span>
+    </div>
+    <p class="hint">Solid dot = a follower (colored by team). Dashed ring = that follower's CURRENT waypoint
+      anchor (vehicle-escort / on-foot-resume / formation slot) -- watch the dot chase the ring to debug a
+      formation or follow-loop live. Green dot = you. Click anywhere on the map to drop a pick point --
+      "Use last map click" buttons below pull it in.</p>
+  </section>
+
+  <div class="grid">
+
+    <section class="card" style="grid-column:1/-1">
+      <h2>Roster (debugger)</h2>
+      <div class="row">
+        <button class="primary" id="btnRosterMonitor">Start monitoring</button>
+        <span class="hint" style="margin:0">Polls <code>Ess.Followers.list()</code> once a second -- reflects
+          whatever's ACTUALLY recruited right now, from any script or REPL session, not just this page.</span>
+      </div>
+      <table id="rosterTable">
+        <thead><tr><th></th><th>guid</th><th>team</th><th>role</th><th>status</th><th>alive</th></tr></thead>
+        <tbody></tbody>
+      </table>
+      <div class="row" style="margin-top:10px">
+        <input type="text" id="recruitGuidExpr" placeholder="guid expression, e.g. Ess.Player.targetUnderReticle(0)">
+        <button data-action id="btnRecruit">Recruit</button>
+        <button id="btnDismissSelected">Dismiss selected</button>
+        <button id="btnDismissAll">Dismiss all</button>
+      </div>
+      <p class="hint">Check rows above to select followers for Dismiss selected, Create Team, or Assign Role.</p>
+    </section>
+
+    <section class="card">
+      <h2>Teams</h2>
+      <div class="row">
+        <input type="text" id="newTeamName" placeholder="team name">
+        <button class="primary" id="btnCreateTeam">Create team from selected</button>
+      </div>
+      <div class="row">
+        <input type="text" id="roleInput" placeholder="role, e.g. driver">
+        <button id="btnAssignRole">Assign role to selected</button>
+      </div>
+      <div class="row">
+        <button id="btnTeamListMonitor">Start monitoring</button>
+        <span class="hint" style="margin:0">Ess.Squad.teams()</span>
+      </div>
+      <div id="teamList" class="pillrow"></div>
+    </section>
+
+    <section class="card">
+      <h2>Orders</h2>
+      <div class="row">
+        <select id="orderTeamSelect"></select>
+        <select id="orderBehavior">
+          <option value="move">move</option>
+          <option value="patrol">patrol</option>
+          <option value="defend">defend</option>
+          <option value="attack">attack</option>
+          <option value="hold">hold</option>
+          <option value="face">face</option>
+          <option value="follow">follow</option>
+          <option value="flee">flee</option>
+          <option value="enter">enter</option>
+          <option value="deploy">deploy</option>
+          <option value="animate">animate</option>
+        </select>
+      </div>
+      <div class="row" id="orderGroupAt">
+        <input type="number" id="orderAtX" placeholder="x" class="num">
+        <input type="number" id="orderAtY" placeholder="y" class="num">
+        <input type="number" id="orderAtZ" placeholder="z" class="num">
+        <button id="btnOrderUseMapClick">Use last map click</button>
+      </div>
+      <div class="row" id="orderGroupRadius">
+        <input type="number" id="orderRadius" placeholder="radius" value="12" class="num">
+      </div>
+      <div class="row" id="orderGroupTarget">
+        <input type="text" id="orderTargetExpr" placeholder="target expression, e.g. Ess.Player.targetUnderReticle(0)">
+      </div>
+      <div class="row" id="orderGroupRole">
+        <select id="orderRole">
+          <option value="driver">driver</option>
+          <option value="passenger">passenger</option>
+          <option value="gunner">gunner</option>
+        </select>
+      </div>
+      <div class="row" id="orderGroupPoints">
+        <textarea id="orderPoints" placeholder="x,y,z per line" rows="3"></textarea>
+      </div>
+      <div class="row" id="orderGroupAction">
+        <input type="text" id="orderAction" placeholder="action, e.g. Cower" value="Cower">
+      </div>
+      <div class="row">
+        <button class="primary" id="btnIssueOrder">Issue Order</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Queue</h2>
+      <div class="row">
+        <select id="queueTeamSelect"></select>
+      </div>
+      <div id="queueSteps"></div>
+      <div class="row">
+        <button id="btnAddQueueStep">+ Add step</button>
+      </div>
+      <div class="row">
+        <button class="primary" id="btnRunQueue">Run Queue</button>
+        <button id="btnCancelQueue">Cancel Queue</button>
+        <span id="queueProgress" class="hint" style="margin:0"></span>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Tactics</h2>
+      <div class="row">
+        <select id="tacticsTeamSelect"></select>
+      </div>
+      <div class="row">
+        <input type="text" id="mountUpVehicleExpr" placeholder="vehicle expression, e.g. Ess.Object.spawnAhead('Veyron', 10)">
+        <button id="btnMountUp">Mount Up</button>
+      </div>
+      <div class="row">
+        <input type="number" id="dismountAtX" placeholder="x" class="num">
+        <input type="number" id="dismountAtY" placeholder="y" class="num">
+        <input type="number" id="dismountAtZ" placeholder="z" class="num">
+        <button id="btnDismountUseMapClick">Use last map click</button>
+      </div>
+      <div class="row">
+        <input type="number" id="dismountRadius" placeholder="radius" value="15" class="num">
+        <button id="btnDismountAndSecure">Dismount And Secure</button>
+      </div>
+    </section>
+
+    <section class="card">
+      <h2>Formation</h2>
+      <div class="row">
+        <select id="formationTeamSelect"></select>
+        <select id="formationType">
+          <option value="wedge">wedge</option>
+          <option value="column">column</option>
+          <option value="line">line</option>
+          <option value="diamond">diamond</option>
+        </select>
+        <input type="number" id="formationSpacing" placeholder="spacing" value="3" class="num">
+      </div>
+      <div class="row">
+        <button class="primary" id="btnSetFormation">Set Formation</button>
+        <button id="btnClearFormation">Clear Formation</button>
+      </div>
+      <p class="hint">Opt-in, on-foot "visual sugar" -- watch it on the Live Map above (each unit's dashed
+        ring is its own formation slot).</p>
+    </section>
+
+    <section class="card" style="grid-column:1/-1">
+      <h2>Run raw Lua</h2>
+      <textarea id="replInput" spellcheck="false">return Ess.VERSION</textarea>
+      <div class="row" style="margin-top:8px">
+        <button class="primary" id="btnRun">Run</button>
+        <span class="hint" style="margin:0">Ctrl+Enter also runs it. Anything Ess (or the raw engine) can
+          do, this box can send.</span>
+      </div>
+    </section>
+
+  </div>
+
+  <div id="log"></div>
+
+</div>
+<script>/*__APP__*/</script>
+</body>
+</html>

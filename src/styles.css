@@ -1,0 +1,168 @@
+/* styles.css -- local styles for this tool. lib/tokens.css (vendored from mercs2-tools-shared) supplies the
+   shared neutrals; this file adds this tool's own accent, the card/form/log chrome copied from
+   mercs2-webtool-template, and the map/roster/queue-specific bits that template didn't need. */
+
+:root {
+  /* this tool's own identity color -- distinct from webtool-template's violet and webmap's lime */
+  --accent:      #38bdf8;
+  --accent-soft: rgba(56, 189, 248, 0.12);
+  --accent-line: rgba(56, 189, 248, 0.35);
+  --accent-ink:  #05202c;
+
+  --ok:   #4ade80;
+  --warn: #fbbf24;
+  --bad:  #f87171;
+}
+
+* { box-sizing: border-box; }
+
+html, body {
+  margin: 0;
+  background: var(--bg);
+  color: var(--text);
+  font: 14px/1.5 var(--font-sans);
+}
+
+.wrap {
+  max-width: var(--maxw);
+  margin: 0 auto;
+  padding: 20px 24px 40px;
+}
+
+code, .mono { font-family: var(--font-mono); }
+
+/* ---------- header / connection bar ---------- */
+header {
+  display: flex;
+  align-items: center;
+  gap: 14px;
+  flex-wrap: wrap;
+  padding-bottom: 16px;
+  margin-bottom: 20px;
+  border-bottom: 1px solid var(--line);
+}
+header h1 { font-size: 17px; margin: 0; font-weight: 700; }
+header .sub { color: var(--text-faint); font-size: 12.5px; }
+
+.connectbar { display: flex; align-items: center; gap: 10px; margin-left: auto; }
+.dot { width: 9px; height: 9px; border-radius: 50%; background: var(--text-faint); flex: none; }
+.dot.connecting { background: var(--warn); }
+.dot.open { background: var(--ok); }
+.dot.closed, .dot.error { background: var(--bad); }
+.statustext { font-size: 12.5px; color: var(--text-muted); min-width: 90px; }
+
+button {
+  background: var(--bg-elev);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 7px 13px;
+  font: inherit;
+  font-size: 13px;
+  cursor: pointer;
+  transition: border-color 0.2s var(--ease), background 0.2s var(--ease);
+}
+button:hover { border-color: var(--line-strong); background: var(--bg-elev-2); }
+button:disabled { opacity: 0.45; cursor: default; }
+button.primary { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+button.primary:hover { background: var(--accent-line); }
+button.on { background: var(--accent-soft); border-color: var(--accent-line); color: var(--accent); }
+
+input[type=text], input[type=number], select, textarea {
+  background: var(--bg);
+  color: var(--text);
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  padding: 7px 10px;
+  font: 13px var(--font-mono);
+}
+input[type=text]:focus, input[type=number]:focus, select:focus, textarea:focus { outline: none; border-color: var(--accent-line); }
+input.num { width: 80px; }
+
+/* ---------- sections ---------- */
+.grid { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+
+section.card {
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  padding: 16px 18px;
+}
+section.card h2 {
+  margin: 0 0 12px;
+  font-size: 11.5px;
+  text-transform: uppercase;
+  letter-spacing: 0.06em;
+  color: var(--text-faint);
+  font-weight: 700;
+}
+.row { display: flex; flex-wrap: wrap; align-items: center; gap: 8px; margin-bottom: 8px; }
+.row:last-child { margin-bottom: 0; }
+.row input[type=text]:not(.num) { flex: 1; min-width: 140px; }
+.row textarea { flex: 1; min-width: 140px; }
+.hint { color: var(--text-faint); font-size: 11.5px; margin-top: 8px; }
+
+/* ---------- live map ---------- */
+#squadMap {
+  height: 460px;
+  border: 1px solid var(--line);
+  border-radius: var(--radius-sm);
+  background: var(--bg);
+}
+.leaflet-container { background: var(--bg); outline: none; }
+.leaflet-bar a { background: var(--bg-elev); color: var(--text); border-bottom-color: var(--line); }
+.leaflet-bar a:hover { background: var(--bg-elev-2); }
+.leaflet-tooltip { background: var(--bg-elev); color: var(--text); border: 1px solid var(--line); font: 11px var(--font-mono); }
+
+/* ---------- roster / team tables ---------- */
+#rosterTable {
+  width: 100%;
+  border-collapse: collapse;
+  font: 12.5px var(--font-mono);
+  margin: 4px 0 0;
+}
+#rosterTable th, #rosterTable td { text-align: left; padding: 6px 8px; border-bottom: 1px solid var(--line); }
+#rosterTable th { color: var(--text-faint); font: 700 10.5px var(--font-sans); text-transform: uppercase; letter-spacing: 0.05em; }
+#rosterTable .empty td { color: var(--text-faint); font-style: italic; }
+#rosterTable .load-bad { color: var(--bad); }
+
+.pillrow { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 8px; }
+.pill {
+  display: inline-block;
+  background: var(--bg-elev-2);
+  border: 1px solid var(--line);
+  border-radius: 999px;
+  padding: 3px 10px;
+  font: 11.5px var(--font-mono);
+  color: var(--text-muted);
+}
+
+/* ---------- queue step rows ---------- */
+.queueStep { display: flex; gap: 6px; align-items: center; margin-bottom: 6px; }
+.queueStep input[type=text] { flex: 1; }
+.queueStep select { flex: none; }
+.queueStep button { padding: 4px 9px; }
+
+/* ---------- log viewer ---------- */
+#log {
+  margin-top: 20px;
+  background: var(--bg-elev);
+  border: 1px solid var(--line);
+  border-radius: var(--radius);
+  height: 220px;
+  overflow-y: auto;
+  padding: 10px 14px;
+  font: 12px/1.6 var(--font-mono);
+  color: var(--text-muted);
+}
+#log .line { white-space: pre-wrap; word-break: break-all; }
+#log .line.err { color: var(--bad); }
+#log .line.repl { color: var(--accent); }
+
+/* ---------- REPL ---------- */
+#replInput {
+  width: 100%;
+  min-height: 64px;
+  resize: vertical;
+  font-size: 12.5px;
+}

@@ -1,0 +1,70 @@
+/* tokens.css -- shared design tokens for the mercs2.tools ecosystem.
+ *
+ * Consolidated from a 2026-07 audit of mercs2-tools/home.css, mercs2-lua-web-ide/src/styles.css,
+ * mercs2-webmap/src/styles.css, gfxforge-web/css/style.css, and mercs2-skinner/index.html. Every one of
+ * those independently arrived at the same dark-panel-on-near-black structure with the same handful of
+ * semantic roles (background / elevated panel / border / primary text / muted text / an accent) -- just
+ * under five different naming schemes, and with radius + font stacks re-typed by hand each time instead
+ * of shared. This file is that structure, named once.
+ *
+ * WHAT'S DELIBERATELY NOT HERE: --accent. Every tool's accent hue is its own identity (mercs2.tools:
+ * amber/orange, the Lua Web IDE: cyan, Live Map: lime, GFXForge: amber, Skinner: blue) -- that's a real,
+ * apparently intentional signal (each subdomain reads as its own tool at a glance) and forcing one shared
+ * accent would erase it. Each site still defines its own --accent / --accent-soft / --accent-line locally;
+ * this file only standardizes the NEUTRALS every one of them already treats the same way.
+ *
+ * HOW TO USE THIS: vendor it at build time (copy this file's contents in, or inline it), same as any
+ * other shared file in this ecosystem. Do NOT `<link>` it from a remote origin at runtime -- most of these
+ * tools are built to also run as a single, offline, double-clickable HTML file (some browsers are also
+ * flaky about WebSocket from a page loaded off a remote origin at all), and a live cross-origin stylesheet
+ * fetch breaks that. Pull a pinned version in, the same way mercs2-lua-essentials's release workflow
+ * already `curl`s another repo's release artifact into its own build.
+ *
+ * MIGRATING AN EXISTING TOOL: these names don't match any one tool's current variables byte-for-byte (see
+ * README.md's mapping table) -- this is the target scheme going forward, not a drop-in replacement for
+ * any single file. Rename incrementally; nothing requires an all-at-once rewrite.
+ */
+
+:root {
+  /* ---- neutrals: every tool already treats these five roles the same way ---- */
+  --bg:           #0d0f13;   /* page background */
+  --bg-elev:      #14171d;   /* first-level elevated surface (a card, a panel) */
+  --bg-elev-2:    #191d24;   /* second-level / hover state of an elevated surface */
+  --line:         rgba(255, 255, 255, 0.08);   /* default border */
+  --line-strong:  rgba(255, 255, 255, 0.14);   /* emphasized / hovered border */
+
+  --text:         #e9ecf1;   /* primary text */
+  --text-muted:   #99a1ae;   /* secondary text */
+  --text-faint:   #6b7280;   /* tertiary / de-emphasized text */
+
+  /* ---- shape ---- */
+  --radius:       14px;  /* cards, panels, modals */
+  --radius-sm:    9px;   /* pills, small controls, inline badges */
+
+  /* ---- motion ---- */
+  --ease:         cubic-bezier(0.16, 1, 0.3, 1);
+
+  /* ---- type ---- */
+  --font-sans: system-ui, -apple-system, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --font-mono: ui-monospace, "SF Mono", "JetBrains Mono", "Cascadia Code", Menlo, Consolas,
+               "Liberation Mono", monospace;
+
+  /* ---- layout ---- */
+  --maxw: 1120px;
+
+  /* ---- accent: EACH SITE SETS THESE FOUR ITSELF. Not defined here on purpose -- see the file header. ----
+  --accent:       ;
+  --accent-soft:  ;   usually --accent at ~12% opacity, for a tinted background wash
+  --accent-line:  ;   usually --accent at ~35% opacity, for a tinted border
+  --accent-ink:   ;   text color placed ON TOP of a solid --accent fill (readable contrast, not --accent
+                      itself) -- only mercs2-lua-web-ide-ai has needed this so far, but it's the kind of
+                      thing every tool eventually wants once it puts text on a filled accent button/badge,
+                      so it's named here even with no value, to keep the convention consistent whenever a
+                      tool does add it.
+  */
+}
+
+/* A light-scheme override is NOT included here. Only mercs2-lua-web-ide currently supports a light theme
+   (data-theme="light" + a prefers-color-scheme media query); the other four are dark-only today. If/when
+   more tools grow a light mode, its token values belong here, mirrored from that tool's existing
+   :root[data-theme="light"] block -- don't invent new ones from scratch. */
