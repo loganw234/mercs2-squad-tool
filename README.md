@@ -9,6 +9,8 @@ Forked from [`mercs2-webtool-template`](../mercs2-webtool-template) (the connect
 with the live-map engine ported in from [`mercs2-webmap`](../mercs2-webmap) (world<->map coordinate
 transform, the push-not-poll live-position pattern).
 
+![The squad tool: live map of follower positions up top, quick-spawn row, and the roster debugger below](docs/screenshots/panel.png)
+
 ## Try it
 
 1. Get the game + lua-bridge running -- [mercs2.tools/#s-start](https://mercs2.tools/#s-start) if you
